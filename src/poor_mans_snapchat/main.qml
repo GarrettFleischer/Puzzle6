@@ -12,11 +12,23 @@ ApplicationWindow {
 
     property int xpos
     property int ypos
+    property bool can_draw: false
+
+    Camera
+    {
+        id: cam_selfie
+    }
 
     Rectangle
     {
         id: big_wrapper
         anchors.fill: parent
+
+        VideoOutput
+        {
+            anchors.fill: parent
+            source: cam_selfie
+        }
 
         Image
         {
@@ -104,6 +116,11 @@ ApplicationWindow {
                     img_pen.opacity = 1
                 }
 
+                onClicked:
+                {
+                    can_draw = !can_draw
+                }
+
                 preventStealing: false
             }
         }
@@ -117,19 +134,32 @@ ApplicationWindow {
 
             onPaint:
             {
+                if(can_draw)
+                {
+                    var ctx = getContext("2d")
 
+                    ctx.fillStyle = "red"
+                    ctx.lineCap = "round"
+                    ctx.fillRect(xpos-1, ypos-1, 25, 25)
+                }
             }
 
             MouseArea{
                 anchors.fill: parent
                 onPressed: {
-
+                    xpos = mouseX
+                    ypos = mouseY
+                    canvas_canvas.requestPaint()
                 }
                 onMouseXChanged: {
-
+                    xpos = mouseX
+                    ypos = mouseY
+                    canvas_canvas.requestPaint()
                 }
                 onMouseYChanged: {
-
+                    xpos = mouseX
+                    ypos = mouseY
+                    canvas_canvas.requestPaint()
                 }
             }
         }
@@ -161,6 +191,12 @@ ApplicationWindow {
                 onReleased:
                 {
                     img_camera.opacity = 1
+                }
+
+                onClicked:
+                {
+                    se_shutter_camera.play()
+                    cam_selfie.imageCapture.capture()
                 }
 
                 preventStealing: false
